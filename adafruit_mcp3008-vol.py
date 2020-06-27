@@ -1,90 +1,34 @@
 #!/usr/bin/env python
 
-# Adapted from Limor "Ladyada" Fried for Adafruit Industries, (c) 2015
-# This code is released into the public domain
+import subprocess
 
-import time
-import os
-import sys
-import RPi.GPIO as GPIO
-import spidev
-#import spi as SPI
-import pdb
-
-spi = spidev.SpiDev()
-#spi = SPI.SPI("/dev/spidev0.0")
-#spi.mode = spi.MODE_0
-#spi.speed = 500000
-spi.open(0, 0)
-INTVL = 0.25 #sec
-DEBUG = 0
-IS_TEST = 0
-
-# read SPI data from MCP3008 chip, 8 possible adc's (0 thru 7)
-def readadc(adcnum):
-	if ((adcnum > 7) or (adcnum < 0)):
-		return -1
-
-	#pdb.set_trace()
-	commandout = [ 0, 0, 0 ]
-	commandout[0] = 0x1 # start-bit
-	commandout[1] = (0x8 | adcnum) << 4 # single-ended bit | A-channel#
-	commandout[2] = 0   # we only need to send 5 bits here
-
-	# Take in result as array of three bytes. 
-	# Return the two lowest bits of the 2nd byte and
-	# all of the third byte
-	r = spi.xfer2(commandout)
-	#r = spi.transfer(commandout)
-
-	# read in 10 ADC bits
-	adcout = ((r[1] & 3) << 8) | r[2]
-	return adcout
+import spiutil
 
 # 10k trim pot connected to adc #0
 potentiometer_adc = 0;
-
-last_read = 0   # this keeps track of the last potentiometer value
 tolerance = 2   # to keep from being jittery we'll only change
 				# volume when the pot has moved more than # 'counts'
 
+amixer_proc = subprocess.Popen(("/usr/bin/amixer", "--stdin"),
+								stdin=subprocess.PIPE,
+								stdout=open("/dev/null", "w"))
+
+def pot_changed(trim_pot):
+	set_volume = trim_pot / 10.24   # convert 10bit adc0 (0-1024) trim pot read into 0-100 volume level
+	set_volume = round(set_volume)  # round out decimal value
+	set_volume = int(set_volume)# cast volume as integer
+
+	print 'Volume = {volume}%  \r'.format(volume=set_volume),
+	sys.stdout.flush()
+	#set_vol_cmd = 'amixer cset numid=1 -- {volume}% > /dev/null' .format(volume = set_volume)
+	#os.system(set_vol_cmd)  # set volume
+	amixer_proc.stdin.write('cset numid=1 -- {volume}%\n'.format(volume=set_volume))
+
+	if DEBUG:
+		print "set_volume", set_volume
+
 try:
-	while True:
-		# we'll assume that the pot didn't move
-		trim_pot_changed = False
-
-		# read the analog pin
-		trim_pot = readadc(potentiometer_adc)
-		# how much has it changed since the last read?
-		pot_adjust = abs(trim_pot - last_read)
-
-		if DEBUG:
-			print "trim_pot:", trim_pot, "pot_adjust:", pot_adjust, "last_read", last_read,
-
-		if ( pot_adjust > tolerance ):
-		   trim_pot_changed = True
-
-		if DEBUG:
-			print "trim_pot_changed", trim_pot_changed
-
-		if ( trim_pot_changed ):
-			set_volume = trim_pot / 10.24   # convert 10bit adc0 (0-1024) trim pot read into 0-100 volume level
-			set_volume = round(set_volume)  # round out decimal value
-			set_volume = int(set_volume)# cast volume as integer
-
-			print 'Volume = {volume}%' .format(volume = set_volume)
-			set_vol_cmd = 'sudo amixer cset numid=1 -- {volume}% > /dev/null' .format(volume = set_volume)
-			os.system(set_vol_cmd)  # set volume
-
-			#if DEBUG:
-			#	print "set_volume", set_volume
-
-			# save the potentiometer reading for the next loop
-			last_read = trim_pot
-
-		# hang out and do nothing for a spell
-		time.sleep(INTVL)
-
-except KeyboardInterrupt:
-	spi.close()
-	sys.exit(0)
+	spiutil.pot_watch(potentiometer_adc, tolerance, pot_changed)
+finally:
+	amixer_proc.stdin.close()
+	amixer_proc.wait()
