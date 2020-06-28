@@ -15,8 +15,8 @@ spi = spidev.SpiDev()
 # For old SPI package
 #spi = SPI.SPI("/dev/spidev0.0")
 #spi.mode = spi.MODE_0
-#spi.speed = 500000
 spi.open(0, 0)
+spi.max_speed_hz = 100000
 INTVL = 0.25 #sec
 DEBUG = 1
 TRACE = 0

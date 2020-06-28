@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import subprocess
+import sys
 
 import spiutil
 
@@ -16,7 +17,7 @@ amixer_proc = subprocess.Popen(("/usr/bin/amixer", "--stdin"),
 def pot_changed(trim_pot):
 	set_volume = trim_pot / 10.24   # convert 10bit adc0 (0-1024) trim pot read into 0-100 volume level
 	set_volume = round(set_volume)  # round out decimal value
-	set_volume = int(set_volume)# cast volume as integer
+	set_volume = int(set_volume)  # cast volume as integer
 
 	print 'Volume = {volume}%  \r'.format(volume=set_volume),
 	sys.stdout.flush()
@@ -24,7 +25,7 @@ def pot_changed(trim_pot):
 	#os.system(set_vol_cmd)  # set volume
 	amixer_proc.stdin.write('cset numid=1 -- {volume}%\n'.format(volume=set_volume))
 
-	if DEBUG:
+	if spiutil.DEBUG:
 		print "set_volume", set_volume
 
 try:

@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import sys
+
 import spiutil
 
 # 10k trim pot connected to adc #0
@@ -21,7 +23,7 @@ def pot_changed(trim_pot):
 	print 'Temp = {level} F \r'.format(level=temp_level),
 	sys.stdout.flush()
 
-	#if DEBUG:
-	#	print "set_level", temp_level
+	if spiutil.DEBUG:
+		print "set_level", temp_level
 
 spiutil.pot_watch(potentiometer_adc, tolerance, pot_changed)

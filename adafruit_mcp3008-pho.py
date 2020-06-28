@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import sys
+
 import spiutil
 
 # 10k trim pot connected to adc #0
@@ -15,7 +17,7 @@ def pot_changed(trim_pot):
 	print 'Photo = {photo}%  \r'.format(photo = set_photo),
 	sys.stdout.flush()
 
-	if DEBUG:
+	if spiutil.DEBUG:
 		print "set_photo", set_photo
 
 spiutil.pot_watch(potentiometer_adc, tolerance, pot_changed)
