@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 
 import sys
 
@@ -14,7 +14,7 @@ def pot_changed(trim_pot):
 	set_photo = round(set_photo)  # round out decimal
 	set_photo /= 10.0
 
-	print 'Photo = {photo}%  \r'.format(photo = set_photo),
+	print '{cctl}Photo = {photo}%  {eol}'.format(cctl=spiutil.CCTL, photo=set_photo, eol=spiutil.EOL),
 	sys.stdout.flush()
 
 	if spiutil.DEBUG:

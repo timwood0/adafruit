@@ -18,11 +18,23 @@ spi = spidev.SpiDev()
 spi.open(0, 0)
 spi.max_speed_hz = 100000
 INTVL = 0.25 #sec
-DEBUG = 1
+DEBUG = 0
 TRACE = 0
+
+# Display utils
+# Home cursor before printing; suppress newline.  Support useful output re-dir to a file.
+HOME_CURSOR = '\x1b[1;1f'  # Home cursor in xterm window XXX $TERM independence
+if sys.stdout.isatty():
+	CCTL = HOME_CURSOR
+	EOL = '\r'
+else:
+	CCTL = ""
+	EOL = '\n'
+
 
 if DEBUG and TRACE:
 	pdb.set_trace()
+
 
 # read SPI data from MCP3008 chip, 8 possible adc's (0 thru 7)
 def readadc(adcnum):

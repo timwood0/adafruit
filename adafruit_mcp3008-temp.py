@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 
 import sys
 
@@ -20,7 +20,7 @@ def pot_changed(trim_pot):
 	temp_level = round(temp_level)  # round out decimal value of degF
 	temp_level = int(temp_level)	# cast level as integer
 
-	print 'Temp = {level} F \r'.format(level=temp_level),
+	print '{cctl}Temp = {level} F  {eol}'.format(cctl=spiutil.CCTL, level=temp_level, eol=spiutil.EOL),
 	sys.stdout.flush()
 
 	if spiutil.DEBUG:

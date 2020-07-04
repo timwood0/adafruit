@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 
 import subprocess
 import sys
@@ -10,6 +10,7 @@ potentiometer_adc = 0;
 tolerance = 2   # to keep from being jittery we'll only change
 				# volume when the pot has moved more than # 'counts'
 
+# Start helper process to set volume
 amixer_proc = subprocess.Popen(("/usr/bin/amixer", "--stdin"),
 								stdin=subprocess.PIPE,
 								stdout=open("/dev/null", "w"))
@@ -19,10 +20,8 @@ def pot_changed(trim_pot):
 	set_volume = round(set_volume)  # round out decimal value
 	set_volume = int(set_volume)  # cast volume as integer
 
-	print 'Volume = {volume}%  \r'.format(volume=set_volume),
+	print '{cctl}Volume = {volume}%  {eol}'.format(cctl=spiutil.CCTL, volume=set_volume, eol=spiutil.EOL),
 	sys.stdout.flush()
-	#set_vol_cmd = 'amixer cset numid=1 -- {volume}% > /dev/null' .format(volume = set_volume)
-	#os.system(set_vol_cmd)  # set volume
 	amixer_proc.stdin.write('cset numid=1 -- {volume}%\n'.format(volume=set_volume))
 
 	if spiutil.DEBUG:
@@ -31,5 +30,6 @@ def pot_changed(trim_pot):
 try:
 	spiutil.pot_watch(potentiometer_adc, tolerance, pot_changed)
 finally:
+	# Close down helper proc.
 	amixer_proc.stdin.close()
 	amixer_proc.wait()
