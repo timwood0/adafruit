@@ -5,7 +5,7 @@ import sys
 
 import spiutil
 
-# 10k trim pot connected to adc #0
+# 10k trim pot connected to ADC #0
 potentiometer_adc = 0;
 tolerance = 2   # to keep from being jittery we'll only change
 				# volume when the pot has moved more than # 'counts'

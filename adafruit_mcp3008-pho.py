@@ -4,7 +4,7 @@ import sys
 
 import spiutil
 
-# 10k trim pot connected to adc #0
+# Photocell on ADC #1
 potentiometer_adc = 1;
 tolerance = 5   # to keep from being jittery we'll only change
 		# photo when the pot has moved more than # 'counts'

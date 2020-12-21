@@ -4,7 +4,7 @@ import sys
 
 import spiutil
 
-# 10k trim pot connected to adc #0
+# Temp sensor on ADC #2
 potentiometer_adc = 2;
 tolerance = 5   # to keep from being jittery we'll only change
 		# photo when the pot has moved more than # 'counts'
