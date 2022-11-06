@@ -8,14 +8,14 @@ import sys
 import Adafruit_MCP4725 as MCP4725
 
 # "Voltages" are unitless parts of 4096 multiplied by Vdd on-board the device
-lowV = 1792 # Approx. firing threshold of LED
+lowV = 3168 # Approx. firing threshold of LED
 highV = 4095
 i2cAddr = 0x62
 mcp4725 = MCP4725.MCP4725(address=i2cAddr)
 
 outV = lowV
 period = 0.04 #sec
-delta = 100
+delta = 50
 while True:
 	mcp4725.set_voltage(outV)
 	time.sleep(period)
